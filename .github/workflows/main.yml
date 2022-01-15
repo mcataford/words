@@ -1,8 +1,8 @@
 name: CICD
-on:
-  push:
-    branches:
-      - main
+on: [push]
+  #  push:
+    #    branches:
+    #      - main
 
 jobs:
   build:
@@ -17,4 +17,14 @@ jobs:
           python-version: ${{ steps.python-version.version }}
       - name: Build
         run: python cli.py build
-          # TODO: Add release
+      - name: Prepare release
+        id: prepare-release
+        run: |
+          echo "::set-output name=release-version::$(date +\"%d-%m-%Y-%T\")"
+      - name: Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_name: ${{ steps.prepare-release.release-version }}
+          tag_name: ${{ steps.prepare-release.release-version }}
