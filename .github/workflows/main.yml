@@ -1,0 +1,20 @@
+name: CICD
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get python version
+        id: python-version
+        run: echo "::set-output name=version::$(cat .python-version)"
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ steps.python-version.version }}
+      - name: Build
+        run: python cli.py build
+          # TODO: Add release
