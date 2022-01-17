@@ -1,8 +1,8 @@
 name: CICD
-on: [push]
-  #  push:
-    #    branches:
-    #      - main
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -20,11 +20,18 @@ jobs:
       - name: Prepare release
         id: prepare-release
         run: |
-          echo "::set-output name=release-version::$(date +\"%d-%m-%Y-%T\")"
+          echo "::set-env name=RELEASE_VERSION::$(date +""%d-%m-%Y-%H-%M"")"
+          echo "::set-env name=DICTIONARY_SIZE::$(cat dictionary.txt | wc -l)"
       - name: Release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "rev ${{ env.RELEASE_VERSION }}"
+          tag_name: ${{ format('rev_{0}', env.RELEASE_VERSION ) }}
+          files: |
+            dictionary.txt
+          body: |
+            Release metadata
+            - ${{ env.DICTIONARY_SIZE }} words in dictionary
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_name: ${{ steps.prepare-release.release-version }}
-          tag_name: ${{ steps.prepare-release.release-version }}
+
