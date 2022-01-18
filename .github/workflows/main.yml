@@ -20,8 +20,8 @@ jobs:
       - name: Prepare release
         id: prepare-release
         run: |
-          echo "::set-env name=RELEASE_VERSION::$(date +""%d-%m-%Y-%H-%M"")"
-          echo "::set-env name=DICTIONARY_SIZE::$(cat dictionary.txt | wc -l)"
+          echo "RELEASE_VERSION=$(date +""%d-%m-%Y-%H-%M"")" >> $GITHUB_ENV
+          echo "DICTIONARY_SIZE=$(cat dictionary.txt | wc -l)" >> $GITHUB_ENV
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
@@ -34,4 +34,3 @@ jobs:
             - ${{ env.DICTIONARY_SIZE }} words in dictionary
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
