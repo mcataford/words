@@ -7,9 +7,14 @@ import urllib.request
 import sys
 import pathlib
 import re
+import logging
 
 SOURCES_PATH = pathlib.Path(pathlib.Path.cwd(), "sources.txt")
 DICTIONARY_PATH = pathlib.Path(pathlib.Path.cwd(), "dictionary.txt")
+
+logger = logging.getLogger('words-cli')
+logging.basicConfig(level=logging.INFO)
+
 
 def build_from_sources():
     """
@@ -24,14 +29,24 @@ def build_from_sources():
 
     words = set()
 
+    logger.info("Fetching from %d sources" % len(sourcelist))
+
     for source in sourcelist:
+        logger.info("Fetching from %s..." % source)
         response = urllib.request.urlopen(source)
-        response_text = response.read().decode()
+ 
+        raw_response = response.read()
+
+        # Decode if UTF8.
+        try:
+            response_text = raw_response.decode()
+        except Exception as e:
+            response_text = str(raw_response)
 
         for word_candidate in re.split(r"\s", response_text):
-            stripped = word_candidate.strip()
+            stripped = word_candidate.strip().lower()
 
-            if re.match(r"^[a-zA-Z]{3,}$", stripped):
+            if re.match(r"^[a-z]{3,}$", stripped):
                 words.add(stripped)
 
     ordered = sorted(list(words))
@@ -39,7 +54,7 @@ def build_from_sources():
     with open(DICTIONARY_PATH, "w") as dictionary:
         dictionary.write('\n'.join(ordered))
 
-    print("Dictionary length: %d words" % len(ordered))
+    logger.info("Dictionary length: %d words" % len(ordered))
 
 def add_to_sources(url: str):
     """
