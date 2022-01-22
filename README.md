@@ -8,8 +8,10 @@ The wordlist is built from great works pulled from [Project Gutenberg](https://w
 
 ## Usage
 
-To add sources to the sourcelist, use `python cli.py add <url>`. The URL should lead to plain text file containing your
-source text. 
+You can build the dictionaries via `python src/build.py`. This will pull the remote sources specified in `sources.txt`
+and will build the different dictionaries:
 
-You can build the dictionary via `python cli.py build` -- the resulting `dictionary.txt` will contain unique lowercased
-words of three or more characters extracted from the materials specified in the sourcelist.
+- The full dictionary (`dictionary_full.txt`) contains all words that contain at least three letters extracted from the
+  source material;
+- The common words dictionary (`dictionary_common.txt`) contains words that appear at least 5 times in the source
+  material;
