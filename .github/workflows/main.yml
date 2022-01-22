@@ -16,21 +16,24 @@ jobs:
         with:
           python-version: ${{ steps.python-version.version }}
       - name: Build
-        run: python cli.py build
+        run: python src/build.py
       - name: Prepare release
         id: prepare-release
         run: |
           echo "RELEASE_VERSION=$(date +""%d-%m-%Y-%H-%M"")" >> $GITHUB_ENV
-          echo "DICTIONARY_SIZE=$(cat dictionary.txt | wc -l)" >> $GITHUB_ENV
+          echo "FULL_DICTIONARY_SIZE=$(cat dictionary_full.txt | wc -l)" >> $GITHUB_ENV
+          echo "COMMON_DICTIONARY_SIZE=$(cat dictionary_common.txt | wc -l)" >> $GITHUB_ENV
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           name: "rev ${{ env.RELEASE_VERSION }}"
           tag_name: ${{ format('rev_{0}', env.RELEASE_VERSION ) }}
           files: |
-            dictionary.txt
+            dictionary_full.txt
+            dictionary_common.txt
           body: |
             Release metadata
-            - ${{ env.DICTIONARY_SIZE }} words in dictionary
+            - ${{ env.FULL_DICTIONARY_SIZE }} words in full dictionary
+            - ${{ env.COMMON_DICTIONARY_SIZE }} words in common words dictionary
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
